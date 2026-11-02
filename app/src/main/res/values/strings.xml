@@ -1,3 +1,33 @@
 <resources>
     <string name="app_name">BookShelf</string>
+
+    <string name="title_list">Моята библиотека</string>
+    <string name="title_edit">Книга</string>
+    <string name="add_book">Добави книга</string>
+
+    <string name="average_fmt">Средна оценка: %1$s ★</string>
+    <string name="no_rating">Средна оценка: —</string>
+    <string name="counts_fmt">Книги: %1$d · Прочетени: %2$d</string>
+    <string name="empty_list">Още няма книги. Натисни + за да добавиш първата.</string>
+
+    <string name="hint_title">Заглавие</string>
+    <string name="hint_author">Автор</string>
+    <string name="rating_label">Оценка (1–5)</string>
+    <string name="read_label">Прочетена</string>
+    <string name="read">✓ Прочетена</string>
+    <string name="unread">Непрочетена</string>
+
+    <string name="save">Запази</string>
+    <string name="share">Препоръчай на приятел</string>
+    <string name="delete">Изтрий</string>
+    <string name="cancel">Отказ</string>
+    <string name="error_required">Задължително поле</string>
+
+    <string name="deleted">Книгата е изтрита</string>
+    <string name="undo">Отмяна</string>
+    <string name="delete_confirm_title">Изтриване</string>
+    <string name="delete_confirm_msg">Сигурна ли си, че искаш да изтриеш тази книга?</string>
+
+    <string name="share_subject">Препоръка за книга</string>
+    <string name="share_chooser">Сподели чрез</string>
 </resources>
