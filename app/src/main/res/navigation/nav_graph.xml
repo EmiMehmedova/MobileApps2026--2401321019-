@@ -9,6 +9,20 @@
         android:id="@+id/bookListFragment"
         android:name="com.emi.bookshelf.ui.BookListFragment"
         android:label="@string/title_list"
-        tools:layout="@layout/fragment_book_list" />
+        tools:layout="@layout/fragment_book_list">
+        <action
+            android:id="@+id/action_list_to_edit"
+            app:destination="@id/bookEditFragment" />
+    </fragment>
 
+    <fragment
+        android:id="@+id/bookEditFragment"
+        android:name="com.emi.bookshelf.ui.BookEditFragment"
+        android:label="@string/title_edit"
+        tools:layout="@layout/fragment_book_edit">
+        <argument
+            android:name="bookId"
+            android:defaultValue="0L"
+            app:argType="long" />
+    </fragment>
 </navigation>
