@@ -27,10 +27,6 @@ android {
         release {
             // Подписваме с debug ключа, за да може release APK да се инсталира
             signingConfig = signingConfigs.getByName("debug")
-            optimization {
-                enable = true
-                packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
-            }
         }
     }
     compileOptions {
