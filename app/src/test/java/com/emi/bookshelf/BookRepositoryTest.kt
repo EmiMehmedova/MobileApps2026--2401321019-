@@ -43,43 +43,46 @@ class BookRepositoryTest {
         repo = BookRepository(FakeBookDao())
     }
 
-    private fun newBook(title: String = "Книга") =
-        Book(title = title, author = "Автор", rating = 3, isRead = false)
+    private fun newBook(title: String = "Книга") = Book(title = title, author = "Автор", rating = 3, isRead = false)
 
     @Test
-    fun save_newBook_isInserted() = runTest {
-        repo.save(newBook())
-        val all = repo.books.first()
-        assertEquals(1, all.size)
-        assertEquals(1L, all[0].id)
-    }
+    fun save_newBook_isInserted() =
+        runTest {
+            repo.save(newBook())
+            val all = repo.books.first()
+            assertEquals(1, all.size)
+            assertEquals(1L, all[0].id)
+        }
 
     @Test
-    fun save_existingBook_isUpdated() = runTest {
-        repo.save(newBook())
-        val saved = repo.books.first()[0]
-        repo.save(saved.copy(title = "Нова", rating = 5))
+    fun save_existingBook_isUpdated() =
+        runTest {
+            repo.save(newBook())
+            val saved = repo.books.first()[0]
+            repo.save(saved.copy(title = "Нова", rating = 5))
 
-        val all = repo.books.first()
-        assertEquals(1, all.size)
-        assertEquals("Нова", all[0].title)
-        assertEquals(5, all[0].rating)
-    }
-
-    @Test
-    fun delete_removesBook() = runTest {
-        repo.save(newBook())
-        repo.delete(repo.books.first()[0])
-        assertEquals(0, repo.books.first().size)
-        assertNull(repo.get(1L))
-    }
+            val all = repo.books.first()
+            assertEquals(1, all.size)
+            assertEquals("Нова", all[0].title)
+            assertEquals(5, all[0].rating)
+        }
 
     @Test
-    fun restore_bringsBookBack() = runTest {
-        repo.save(newBook())
-        val book = repo.books.first()[0]
-        repo.delete(book)
-        repo.restore(book)
-        assertEquals(book, repo.get(book.id))
-    }
+    fun delete_removesBook() =
+        runTest {
+            repo.save(newBook())
+            repo.delete(repo.books.first()[0])
+            assertEquals(0, repo.books.first().size)
+            assertNull(repo.get(1L))
+        }
+
+    @Test
+    fun restore_bringsBookBack() =
+        runTest {
+            repo.save(newBook())
+            val book = repo.books.first()[0]
+            repo.delete(book)
+            repo.restore(book)
+            assertEquals(book, repo.get(book.id))
+        }
 }

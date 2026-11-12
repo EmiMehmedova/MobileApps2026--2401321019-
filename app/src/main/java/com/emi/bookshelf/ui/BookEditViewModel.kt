@@ -8,7 +8,9 @@ import com.emi.bookshelf.data.Book
 import com.emi.bookshelf.data.BookRepository
 import kotlinx.coroutines.launch
 
-class BookEditViewModel(private val repository: BookRepository) : ViewModel() {
+class BookEditViewModel(
+    private val repository: BookRepository,
+) : ViewModel() {
     private val _book = MutableLiveData<Book?>()
     val book: LiveData<Book?> = _book
 

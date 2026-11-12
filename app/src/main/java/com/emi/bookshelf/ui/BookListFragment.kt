@@ -16,12 +16,16 @@ import com.google.android.material.snackbar.Snackbar
 import java.util.Locale
 
 class BookListFragment : Fragment(R.layout.fragment_book_list) {
+    @Suppress("ktlint:standard:backing-property-naming")
     private var _binding: FragmentBookListBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: BookListViewModel by viewModels { ViewModelFactory(repository) }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentBookListBinding.bind(view)
 
@@ -38,14 +42,15 @@ class BookListFragment : Fragment(R.layout.fragment_book_list) {
         }
 
         viewModel.stats.observe(viewLifecycleOwner) { stats ->
-            binding.tvAverage.text = if (stats.average == null) {
-                getString(R.string.no_rating)
-            } else {
-                getString(
-                    R.string.average_fmt,
-                    String.format(Locale.getDefault(), "%.1f", stats.average)
-                )
-            }
+            binding.tvAverage.text =
+                if (stats.average == null) {
+                    getString(R.string.no_rating)
+                } else {
+                    getString(
+                        R.string.average_fmt,
+                        String.format(Locale.getDefault(), "%.1f", stats.average),
+                    )
+                }
             binding.tvCounts.text = getString(R.string.counts_fmt, stats.count, stats.readCount)
         }
     }
@@ -56,26 +61,31 @@ class BookListFragment : Fragment(R.layout.fragment_book_list) {
 
     private fun attachSwipeToDelete(adapter: BookAdapter) {
         val vm = viewModel
-        val callback = object : ItemTouchHelper.SimpleCallback(
-            0,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-        ) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean = false
+        val callback =
+            object : ItemTouchHelper.SimpleCallback(
+                0,
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
+            ) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder,
+                ): Boolean = false
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                if (position == RecyclerView.NO_POSITION) return
-                val book = adapter.bookAt(position)
-                vm.delete(book)
-                Snackbar.make(viewHolder.itemView, R.string.deleted, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.undo) { vm.restore(book) }
-                    .show()
+                override fun onSwiped(
+                    viewHolder: RecyclerView.ViewHolder,
+                    direction: Int,
+                ) {
+                    val position = viewHolder.adapterPosition
+                    if (position == RecyclerView.NO_POSITION) return
+                    val book = adapter.bookAt(position)
+                    vm.delete(book)
+                    Snackbar
+                        .make(viewHolder.itemView, R.string.deleted, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.undo) { vm.restore(book) }
+                        .show()
+                }
             }
-        }
         ItemTouchHelper(callback).attachToRecyclerView(binding.recycler)
     }
 

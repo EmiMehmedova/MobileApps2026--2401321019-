@@ -11,7 +11,9 @@ import com.emi.bookshelf.domain.LibraryStats
 import com.emi.bookshelf.domain.toStats
 import kotlinx.coroutines.launch
 
-class BookListViewModel(private val repository: BookRepository) : ViewModel() {
+class BookListViewModel(
+    private val repository: BookRepository,
+) : ViewModel() {
     val books: LiveData<List<Book>> = repository.books.asLiveData()
     val stats: LiveData<LibraryStats> = books.map { it.toStats() }
 

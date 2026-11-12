@@ -9,8 +9,10 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class StatsTest {
-    private fun book(rating: Int, read: Boolean = false) =
-        Book(title = "T", author = "A", rating = rating, isRead = read)
+    private fun book(
+        rating: Int,
+        read: Boolean = false,
+    ) = Book(title = "T", author = "A", rating = rating, isRead = read)
 
     @Test
     fun average_ofEmptyList_isNull() {

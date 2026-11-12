@@ -14,13 +14,17 @@ import com.emi.bookshelf.repository
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class BookEditFragment : Fragment(R.layout.fragment_book_edit) {
+    @Suppress("ktlint:standard:backing-property-naming")
     private var _binding: FragmentBookEditBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: BookEditViewModel by viewModels { ViewModelFactory(repository) }
     private var bookId = 0L
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentBookEditBinding.bind(view)
         bookId = arguments?.getLong("bookId") ?: 0L
@@ -50,8 +54,16 @@ class BookEditFragment : Fragment(R.layout.fragment_book_edit) {
     }
 
     private fun readForm(): Book? {
-        val title = binding.inputTitle.text?.toString().orEmpty().trim()
-        val author = binding.inputAuthor.text?.toString().orEmpty().trim()
+        val title =
+            binding.inputTitle.text
+                ?.toString()
+                .orEmpty()
+                .trim()
+        val author =
+            binding.inputAuthor.text
+                ?.toString()
+                .orEmpty()
+                .trim()
         binding.tilTitle.error = if (title.isEmpty()) getString(R.string.error_required) else null
         binding.tilAuthor.error = if (author.isEmpty()) getString(R.string.error_required) else null
         if (title.isEmpty() || author.isEmpty()) return null
@@ -60,17 +72,21 @@ class BookEditFragment : Fragment(R.layout.fragment_book_edit) {
             id = bookId,
             title = title,
             author = author,
-            rating = binding.ratingBar.rating.toInt().coerceIn(1, 5),
-            isRead = binding.cbRead.isChecked
+            rating =
+                binding.ratingBar.rating
+                    .toInt()
+                    .coerceIn(1, 5),
+            isRead = binding.cbRead.isChecked,
         )
     }
 
     private fun shareBook(book: Book) {
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_subject))
-            putExtra(Intent.EXTRA_TEXT, book.shareText())
-        }
+        val intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_subject))
+                putExtra(Intent.EXTRA_TEXT, book.shareText())
+            }
         startActivity(Intent.createChooser(intent, getString(R.string.share_chooser)))
     }
 
@@ -81,8 +97,7 @@ class BookEditFragment : Fragment(R.layout.fragment_book_edit) {
             .setNegativeButton(R.string.cancel, null)
             .setPositiveButton(R.string.delete) { _, _ ->
                 viewModel.book.value?.let { viewModel.delete(it) }
-            }
-            .show()
+            }.show()
     }
 
     override fun onDestroyView() {

@@ -2,7 +2,9 @@ package com.emi.bookshelf.data
 
 import kotlinx.coroutines.flow.Flow
 
-class BookRepository(private val dao: BookDao) {
+class BookRepository(
+    private val dao: BookDao,
+) {
     val books: Flow<List<Book>> = dao.observeAll()
 
     suspend fun get(id: Long): Book? = dao.getById(id)
