@@ -52,7 +52,7 @@
 
 1. Клонирай репото:
    ```
-   git clone https://github.com/EmiMehmedova/MobileApps2025-2401321019.git
+   git clone https://github.com/EmiMehmedova/MobileApps2026--2401321019-.git
    ```
 2. Отвори проекта в Android Studio.
 3. Изчакай Gradle Sync да приключи.
