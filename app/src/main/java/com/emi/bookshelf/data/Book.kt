@@ -10,4 +10,5 @@ data class Book(
     val author: String,
     val rating: Int,
     val isRead: Boolean,
+    val coverPath: String? = null,
 )
