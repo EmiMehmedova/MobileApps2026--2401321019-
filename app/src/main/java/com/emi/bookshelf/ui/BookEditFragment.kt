@@ -1,10 +1,17 @@
 package com.emi.bookshelf.ui
 
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.emi.bookshelf.R
 import com.emi.bookshelf.data.Book
@@ -12,6 +19,11 @@ import com.emi.bookshelf.databinding.FragmentBookEditBinding
 import com.emi.bookshelf.domain.shareText
 import com.emi.bookshelf.repository
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.util.UUID
 
 class BookEditFragment : Fragment(R.layout.fragment_book_edit) {
     @Suppress("ktlint:standard:backing-property-naming")
@@ -20,6 +32,12 @@ class BookEditFragment : Fragment(R.layout.fragment_book_edit) {
 
     private val viewModel: BookEditViewModel by viewModels { ViewModelFactory(repository) }
     private var bookId = 0L
+    private var coverPath: String? = null
+
+    private val pickCover =
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) saveCover(uri)
+        }
 
     override fun onViewCreated(
         view: View,
@@ -28,6 +46,8 @@ class BookEditFragment : Fragment(R.layout.fragment_book_edit) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentBookEditBinding.bind(view)
         bookId = arguments?.getLong("bookId") ?: 0L
+        coverPath = savedInstanceState?.getString(KEY_COVER)
+        showCover()
 
         if (bookId != 0L) {
             binding.btnDelete.visibility = View.VISIBLE
@@ -41,6 +61,9 @@ class BookEditFragment : Fragment(R.layout.fragment_book_edit) {
             if (done) findNavController().navigateUp()
         }
 
+        binding.btnPickCover.setOnClickListener {
+            pickCover.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
         binding.btnSave.setOnClickListener { readForm()?.let { viewModel.save(it) } }
         binding.btnShare.setOnClickListener { readForm()?.let { shareBook(it) } }
         binding.btnDelete.setOnClickListener { confirmDelete() }
@@ -51,6 +74,48 @@ class BookEditFragment : Fragment(R.layout.fragment_book_edit) {
         binding.inputAuthor.setText(book.author)
         binding.ratingBar.rating = book.rating.toFloat()
         binding.cbRead.isChecked = book.isRead
+        coverPath = book.coverPath
+        showCover()
+    }
+
+    private fun showCover() {
+        val path = coverPath
+        if (path != null && File(path).exists()) {
+            binding.imgCover.setImageURI(Uri.fromFile(File(path)))
+            binding.imgCover.visibility = View.VISIBLE
+        } else {
+            binding.imgCover.visibility = View.GONE
+        }
+    }
+
+    private fun saveCover(uri: Uri) {
+        val appContext = requireContext().applicationContext
+        viewLifecycleOwner.lifecycleScope.launch {
+            val path = withContext(Dispatchers.IO) { copyCover(appContext, uri) }
+            if (path != null) {
+                coverPath = path
+                showCover()
+            }
+        }
+    }
+
+    private fun copyCover(
+        context: Context,
+        uri: Uri,
+    ): String? {
+        val resolver = context.contentResolver
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+        var sample = 1
+        while (bounds.outWidth / sample > MAX_COVER_SIZE) sample *= 2
+        val options = BitmapFactory.Options().apply { inSampleSize = sample }
+        val bitmap =
+            resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
+                ?: return null
+        val dir = File(context.filesDir, "covers").apply { mkdirs() }
+        val file = File(dir, "${UUID.randomUUID()}.jpg")
+        file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 85, it) }
+        return file.absolutePath
     }
 
     private fun readForm(): Book? {
@@ -77,6 +142,7 @@ class BookEditFragment : Fragment(R.layout.fragment_book_edit) {
                     .toInt()
                     .coerceIn(1, 5),
             isRead = binding.cbRead.isChecked,
+            coverPath = coverPath,
         )
     }
 
@@ -100,8 +166,18 @@ class BookEditFragment : Fragment(R.layout.fragment_book_edit) {
             }.show()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(KEY_COVER, coverPath)
+    }
+
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    private companion object {
+        const val KEY_COVER = "coverPath"
+        const val MAX_COVER_SIZE = 1280
     }
 }

@@ -16,6 +16,8 @@
     <string name="read_label">Прочетена</string>
     <string name="read">✓ Прочетена</string>
     <string name="unread">Непрочетена</string>
+    <string name="add_cover">Добави снимка</string>
+    <string name="cover_description">Корица на книгата</string>
 
     <string name="save">Запази</string>
     <string name="share">Препоръчай на приятел</string>
