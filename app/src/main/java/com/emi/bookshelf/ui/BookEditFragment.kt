@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -147,11 +148,20 @@ class BookEditFragment : Fragment(R.layout.fragment_book_edit) {
     }
 
     private fun shareBook(book: Book) {
+        val context = requireContext()
+        val coverFile = book.coverPath?.let { File(it) }?.takeIf { it.exists() }
         val intent =
             Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
                 putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_subject))
                 putExtra(Intent.EXTRA_TEXT, book.shareText())
+                if (coverFile != null) {
+                    val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", coverFile)
+                    type = "image/jpeg"
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                } else {
+                    type = "text/plain"
+                }
             }
         startActivity(Intent.createChooser(intent, getString(R.string.share_chooser)))
     }
